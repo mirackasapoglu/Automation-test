@@ -32,9 +32,14 @@ async function globalSetup(_config: FullConfig) {
     console.log('⚠ Session geçersiz veya süresi dolmuş — yeniden giriş yapılıyor...');
   }
 
+  // Google Chrome varsa kullan (bot korumasını atlar), yoksa bundled Chromium
+  const hasChromeInstalled = await chromium.launch({ channel: 'chrome', headless: true })
+    .then(b => { b.close(); return true; })
+    .catch(() => false);
+
   const browser = await chromium.launch({
     headless: false,
-    channel: 'chrome',  // Asıl Chrome — Google bot korumasını atlar
+    ...(hasChromeInstalled ? { channel: 'chrome' } : {}),
     args: ['--disable-blink-features=AutomationControlled'],
   });
 
