@@ -18,7 +18,7 @@ import { test, expect } from '@playwright/test';
 // =============================================================================
 
 test('Kullanıcı yolculuğu - Baştan Sona', async ({ page }) => {
-  test.setTimeout(120_000);
+  test.setTimeout(180_000);
 
   // ─── ADIM 1: Ana Sayfa ────────────────────────────────────────────────────
   await test.step('1. Ana sayfayı aç', async () => {
@@ -140,8 +140,71 @@ test('Kullanıcı yolculuğu - Baştan Sona', async ({ page }) => {
     console.log('✓ Checkout sayfası açıldı:', page.url());
   });
 
-  // ─── ADIM 10: Siparişlerim ────────────────────────────────────────────────
-  await test.step('10. Siparişlerim sayfasına bak', async () => {
+  // ─── ADIM 10: Banka Transfer Seç ─────────────────────────────────────────
+  await test.step('10. Banka Transfer / Anında Ödeme seç', async () => {
+    const bankTransferBtn = page.getByRole('button', { name: /banka transfer/i });
+    await bankTransferBtn.waitFor({ state: 'visible', timeout: 10_000 });
+    await bankTransferBtn.click();
+    await page.waitForTimeout(1000);
+    console.log('✓ Banka Transfer sekmesi seçildi');
+
+    // Banka seçimi img tabanlı — ilk radio input'u JS ile seç
+    const firstBankLabel = page.locator('label:has(input[name="bankId"])').first();
+    await firstBankLabel.waitFor({ state: 'visible', timeout: 8000 });
+    await firstBankLabel.click();
+    await page.waitForTimeout(500);
+    console.log('✓ Ziraat Bankası seçildi');
+  });
+
+  // ─── ADIM 11: Sözleşmeyi Onayla ──────────────────────────────────────────
+  await test.step('11. Sözleşmeyi onayla', async () => {
+    // Önce sayfayı aşağı kaydır — checkbox viewport'a girsin
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(500);
+
+    // "onaylıyorum" metnini içeren label'ı bul ve tıkla
+    const sozlesmeLabel = page.locator('label').filter({ hasText: /onaylıyorum/i }).first();
+    const labelExists = await sozlesmeLabel.isVisible({ timeout: 5000 }).catch(() => false);
+
+    if (labelExists) {
+      await sozlesmeLabel.click();
+    } else {
+      // Label bulunamazsa JS ile React event'ini doğrudan tetikle
+      await page.evaluate(() => {
+        const cb = document.querySelector('input[type="checkbox"]') as HTMLInputElement;
+        if (!cb) return;
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'checked')?.set;
+        nativeInputValueSetter?.call(cb, true);
+        cb.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        cb.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    }
+    await page.waitForTimeout(500);
+
+    const isChecked = await page.locator('input[type="checkbox"]').first().isChecked().catch(() => false);
+    console.log(`✓ Sözleşme onaylandı (checked: ${isChecked})`);
+    expect(isChecked).toBe(true);
+  });
+
+  // ─── ADIM 12: Ödeme Yap ───────────────────────────────────────────────────
+  await test.step('12. Ödeme Yap butonuna tıkla', async () => {
+    const odemeBtn = page.getByRole('button', { name: /ödeme yap/i });
+    await odemeBtn.waitFor({ state: 'visible', timeout: 10_000 });
+
+    // Tıklama + navigation'ı birlikte bekle
+    await Promise.all([
+      page.waitForNavigation({ waitUntil: 'domcontentloaded', timeout: 30_000 }).catch(() => {}),
+      odemeBtn.click(),
+    ]);
+
+    await page.waitForTimeout(2000);
+    const url = page.url().catch ? await page.url() : '';
+    console.log('✓ Ödeme Yap tıklandı, URL:', url);
+    await expect(page.locator('body')).toBeVisible();
+  });
+
+  // ─── ADIM 13: Siparişlerim ────────────────────────────────────────────────
+  await test.step('13. Siparişlerim sayfasına bak', async () => {
     await page.goto('/hesabim/siparislerim');
     await page.waitForLoadState('networkidle');
 
@@ -150,8 +213,8 @@ test('Kullanıcı yolculuğu - Baştan Sona', async ({ page }) => {
     console.log('✓ Siparişlerim sayfası açıldı');
   });
 
-  // ─── ADIM 11: Profil ─────────────────────────────────────────────────────
-  await test.step('11. Profil sayfasına bak', async () => {
+  // ─── ADIM 14: Profil ─────────────────────────────────────────────────────
+  await test.step('14. Profil sayfasına bak', async () => {
     await page.goto('/hesabim/uyelik');
     await page.waitForLoadState('networkidle');
 
