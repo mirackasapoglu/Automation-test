@@ -1,21 +1,18 @@
 import { test, expect } from '@playwright/test';
+import { ProfilePage } from '../pages/ProfilePage';
 
 test('Profil sayfasi aciliyor', async ({ page }) => {
-  await page.goto('/hesabim/uyelik');
-  await page.waitForLoadState('networkidle');
+  const profilePage = new ProfilePage(page);
+  await profilePage.goto();
 
-  // Login sayfasina yönlendirilmemeli
   await expect(page).not.toHaveURL(/hesap\/giris/);
-
-  // Sayfa görünmeli
   await expect(page.locator('body')).toBeVisible();
 });
 
 test('Profil sayfasinda form elemanlari var', async ({ page }) => {
-  await page.goto('/hesabim/uyelik');
-  await page.waitForLoadState('networkidle');
+  const profilePage = new ProfilePage(page);
+  await profilePage.goto();
 
-  // En az bir input olmali
-  const inputs = await page.locator('input').count();
+  const inputs = await profilePage.inputCount();
   expect(inputs).toBeGreaterThan(0);
 });

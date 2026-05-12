@@ -1,11 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
 
 test('Login sayfasi yonlendirmesi calisiyor', async ({ page }) => {
-  await page.goto('/hesap/giris');
-  await page.waitForLoadState('domcontentloaded');
+  const loginPage = new LoginPage(page);
+  await loginPage.goto();
 
-  // Zaten giriş yapmışsan ana sayfaya yönlendirebilir
-  // veya login sayfasında kalabilir — ikisini de kontrol et
   const url = page.url();
   const isLoginPage = url.includes('hesap/giris');
   const isHomepage = url.includes('nadirgold.work');
@@ -16,11 +15,10 @@ test('Login sayfasi yonlendirmesi calisiyor', async ({ page }) => {
 test('Login formu elemanlari görünüyor (oturumsuz)', async ({ browser }) => {
   const ctx = await browser.newContext({ storageState: undefined });
   const page = await ctx.newPage();
+  const loginPage = new LoginPage(page);
 
-  await page.goto('https://www.nadirgold.work/hesap/giris');
-  await page.waitForLoadState('domcontentloaded');
+  await loginPage.goto();
 
-  // En az bir input elemanı olmalı
   const inputs = await page.locator('input').count();
   expect(inputs).toBeGreaterThan(0);
 
