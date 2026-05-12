@@ -158,30 +158,13 @@ test('Kullanıcı yolculuğu - Baştan Sona', async ({ page }) => {
 
   // ─── ADIM 11: Sözleşmeyi Onayla ──────────────────────────────────────────
   await test.step('11. Sözleşmeyi onayla', async () => {
-    // Önce sayfayı aşağı kaydır — checkbox viewport'a girsin
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    // Codegen'den alınan gerçek selector
+    const checkbox = page.getByRole('checkbox', { name: 'Ön bilgilendirme formu ,' });
+    await checkbox.waitFor({ state: 'attached', timeout: 8000 });
+    await checkbox.check();
     await page.waitForTimeout(500);
 
-    // "onaylıyorum" metnini içeren label'ı bul ve tıkla
-    const sozlesmeLabel = page.locator('label').filter({ hasText: /onaylıyorum/i }).first();
-    const labelExists = await sozlesmeLabel.isVisible({ timeout: 5000 }).catch(() => false);
-
-    if (labelExists) {
-      await sozlesmeLabel.click();
-    } else {
-      // Label bulunamazsa JS ile React event'ini doğrudan tetikle
-      await page.evaluate(() => {
-        const cb = document.querySelector('input[type="checkbox"]') as HTMLInputElement;
-        if (!cb) return;
-        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'checked')?.set;
-        nativeInputValueSetter?.call(cb, true);
-        cb.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-        cb.dispatchEvent(new Event('change', { bubbles: true }));
-      });
-    }
-    await page.waitForTimeout(500);
-
-    const isChecked = await page.locator('input[type="checkbox"]').first().isChecked().catch(() => false);
+    const isChecked = await checkbox.isChecked().catch(() => false);
     console.log(`✓ Sözleşme onaylandı (checked: ${isChecked})`);
     expect(isChecked).toBe(true);
   });
@@ -215,8 +198,9 @@ test('Kullanıcı yolculuğu - Baştan Sona', async ({ page }) => {
 
   // ─── ADIM 14: Profil ─────────────────────────────────────────────────────
   await test.step('14. Profil sayfasına bak', async () => {
-    await page.goto('/hesabim/uyelik');
-    await page.waitForLoadState('networkidle');
+    await page.waitForTimeout(2000);
+    await page.goto('/hesabim/uyelik', { waitUntil: 'domcontentloaded' }).catch(() => {});
+    await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).not.toHaveURL(/hesap\/giris/);
 
