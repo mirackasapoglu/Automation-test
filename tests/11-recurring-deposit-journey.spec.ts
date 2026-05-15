@@ -10,13 +10,13 @@ import { ProfilePage } from '../pages/ProfilePage';
 test('Düzenli Birikim Akışı - Baştan Sona', async ({ page }) => {
   test.setTimeout(240_000);
 
-  const homePage     = new HomePage(page);
+  const homePage = new HomePage(page);
   const categoryPage = new CategoryPage(page);
-  const productPage  = new ProductPage(page);
-  const cartPage     = new CartPage(page);
+  const productPage = new ProductPage(page);
+  const cartPage = new CartPage(page);
   const checkoutPage = new CheckoutPage(page);
-  const ordersPage   = new OrdersPage(page);
-  const profilePage  = new ProfilePage(page);
+  const ordersPage = new OrdersPage(page);
+  const profilePage = new ProfilePage(page);
 
   await test.step('1. Ana sayfayı aç', async () => {
     await homePage.goto();
@@ -82,16 +82,16 @@ test('Düzenli Birikim Akışı - Baştan Sona', async ({ page }) => {
     console.log('✓ Düzenli Birikim seçildi ve sepete eklendi');
   });
 
-await test.step('9. Sepete git', async () => {
-  await cartPage.goto();
-  await cartPage.waitForSidebar(8000);
+  await test.step('9. Sepete git', async () => {
+    await cartPage.goto();
+    await cartPage.waitForSidebar(8000);
 
-  const silBtnCount = await cartPage.deleteButtonCount();
-  const hasTLText = await cartPage.hasPriceText();
+    const silBtnCount = await cartPage.deleteButtonCount();
+    const hasTLText = await cartPage.hasPriceText();
 
-  console.log(`✓ Sepet — Ürün sayısı: ${silBtnCount}, Fiyat görünüyor: ${hasTLText}`);
-  expect(silBtnCount > 0 || hasTLText).toBe(true);
-});
+    console.log(`✓ Sepet — Ürün sayısı: ${silBtnCount}, Fiyat görünüyor: ${hasTLText}`);
+    expect(silBtnCount > 0 || hasTLText).toBe(true);
+  });
 
   await test.step('10. Sepeti kontrol et', async () => {
     const silBtnCount = await cartPage.deleteButtonCount();
@@ -114,6 +114,7 @@ await test.step('9. Sepete git', async () => {
     await page.getByPlaceholder('Talimat Adı Giriniz').fill('test');
     console.log('✓ Talimat adı girildi');
   });
+
 
   await test.step('13. Ön bilgilendirme formunu onayla', async () => {
     await page.getByRole('checkbox', { name: 'Ön bilgilendirme formu ,' }).check();

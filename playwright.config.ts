@@ -12,6 +12,7 @@ export default defineConfig({
     storageState: 'playwright/.auth/user.json',
     trace: 'on-first-retry',
   },
+  
 
   projects: [
     {

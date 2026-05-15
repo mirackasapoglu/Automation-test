@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "description": "NadirGold QA Automation Suite",
   "scripts": {
-    "test":   "playwright test --project=chromium",
+    "test": "playwright test --project=chromium",
     "test:headed": "playwright test --project=chromium --headed",
     "test:e2e": "playwright test tests/09-full-user-journey.spec.ts --project=chromium --headed",
     "test:havale": "playwright test tests/09-full-user-journey.spec.ts --project=chromium --headed",
     "test:kredi": "playwright test tests/10-credit-card-journey.spec.ts --project=chromium --headed",
-    "test:düzenli": "playwright test tests/11-recurring-deposit-journey.spec.ts --project=chromium --headed",
-
+    "test:duzenli": "playwright test tests/11-recurring-deposit-journey.spec.ts --project=chromium --headed",
+    "test:ayda1": "playwright test tests/11-ayda-1-birikim.spec.ts --project=chromium --headed",
+    "test:2ayda1": "playwright test tests/12-2-ayda-1-birikim.spec.ts --project=chromium --headed",
+    "test:3ayda1": "playwright test tests/13-3-ayda-1-birikim.spec.ts --project=chromium --headed",
+    "test:4ayda1": "playwright test tests/14-4-ayda-1-birikim.spec.ts --project=chromium --headed",
+    "test:6ayda1": "playwright test tests/15-6-ayda-1-birikim.spec.ts --project=chromium --headed",
     "report": "playwright show-report"
   },
   "devDependencies": {
