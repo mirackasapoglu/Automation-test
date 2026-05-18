@@ -16,7 +16,16 @@ export class ProductPage {
     await this.page.waitForLoadState('networkidle');
   }
 
+  async selectOneTimePurchase() {
+    const tab = this.page.getByText(/tek seferlik alım/i).first();
+    if (await tab.isVisible({ timeout: 3000 }).catch(() => false)) {
+      await tab.click();
+      await this.page.waitForTimeout(300);
+    }
+  }
+
   async addToCart() {
+    await this.selectOneTimePurchase();
     await this.addToCartButton.waitFor({ state: 'visible', timeout: 10_000 });
     await this.addToCartButton.evaluate(el => (el as HTMLElement).click());
     await this.page.waitForTimeout(1500);
