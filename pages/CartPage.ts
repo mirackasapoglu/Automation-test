@@ -44,4 +44,19 @@ export class CartPage {
   async isCartEmpty(): Promise<boolean> {
     return this.emptyCartMessage.isVisible().catch(() => false);
   }
+
+  async clearAll() {
+    await this.page.goto('/sepet');
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForTimeout(1500);
+
+    let safety = 15;
+    while (safety-- > 0) {
+      const count = await this.deleteButtons.count();
+      if (count === 0) break;
+      // JS click — sidebar/overlay görünürlük kontrolünü bypass et
+      await this.deleteButtons.first().evaluate(el => (el as HTMLElement).click()).catch(() => {});
+      await this.page.waitForTimeout(800);
+    }
+  }
 }

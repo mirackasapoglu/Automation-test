@@ -23,6 +23,9 @@ test('Düzenli Birikim Akışı - 3 Ayda 1', async ({ page }) => {
         await expect(page).toHaveURL(/nadirgold\.work/);
         await expect(page.locator('body')).toBeVisible();
         console.log('✓ Ana sayfa açıldı:', page.url());
+        await cartPage.clearAll();
+        await homePage.goto();
+        console.log('✓ Sepet temizlendi, ana sayfaya dönüldü');
     });
 
     await test.step('2. Popup varsa kapat', async () => {
@@ -114,24 +117,29 @@ test('Düzenli Birikim Akışı - 3 Ayda 1', async ({ page }) => {
     await test.step('12. 3 Ayda 1 düzenli birikim talimatını seç', async () => {
 
         await page.getByPlaceholder('Talimat Adı Giriniz')
-            .fill('test-3-ayda-1');
+            .fill(`test-3-ayda-1-${Date.now()}`);
 
         await page.waitForTimeout(500);
 
-        // Slider'ı en sola resetle, sonra hedefe git (Her Ay → 2 → 3 → 4 → 6)
-        // Hedef: 3 Ayda 1 = offset 2
         const sliderHandle = page.locator('.rc-slider-handle').first();
-        await sliderHandle.focus();
-        for (let i = 0; i < 10; i++) {
-            await page.keyboard.press('ArrowLeft');
+        const slider = page.locator('.rc-slider');
+
+        // Önce en sola resetle
+        for (let i = 0; i < 15; i++) {
+            await sliderHandle.press('ArrowLeft');
         }
-        await page.waitForTimeout(300);
-        await page.keyboard.press('ArrowRight');
-        await page.waitForTimeout(100);
-        await page.keyboard.press('ArrowRight');
         await page.waitForTimeout(500);
 
-        await expect(page.locator('.rc-slider')).toContainText('3 Ayda 1');
+        // Hedefe ulaşana kadar sağa kaydır
+        for (let attempt = 0; attempt < 10; attempt++) {
+            const currentText = (await slider.textContent()) ?? '';
+            if (currentText.includes('3 Ayda 1')) break;
+            await sliderHandle.press('ArrowRight');
+            await page.waitForTimeout(300);
+        }
+        await page.waitForTimeout(500);
+
+        await expect(slider).toContainText('3 Ayda 1');
 
         const acceptButton = page.getByRole('button', { name: 'Kabul Et' });
         if (await acceptButton.isVisible({ timeout: 3000 }).catch(() => false)) {

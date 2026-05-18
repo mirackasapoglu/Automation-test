@@ -33,6 +33,9 @@ test('Kullanıcı yolculuğu - Kredi Kartı ile Ödeme', async ({ page }) => {
     await expect(page).toHaveURL(/nadirgold\.work/);
     await expect(page.locator('body')).toBeVisible();
     console.log('✓ Ana sayfa açıldı:', page.url());
+    await cartPage.clearAll();
+    await homePage.goto();
+    console.log('✓ Sepet temizlendi, ana sayfaya dönüldü');
   });
 
   // ─── ADIM 2: Popup Kapat ────────────────────────────────────────────────────

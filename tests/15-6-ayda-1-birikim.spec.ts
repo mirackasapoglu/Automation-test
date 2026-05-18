@@ -23,6 +23,9 @@ test('Düzenli Birikim Akışı - 6 Ayda 1', async ({ page }) => {
         await expect(page).toHaveURL(/nadirgold\.work/);
         await expect(page.locator('body')).toBeVisible();
         console.log('✓ Ana sayfa açıldı:', page.url());
+        await cartPage.clearAll();
+        await homePage.goto();
+        console.log('✓ Sepet temizlendi, ana sayfaya dönüldü');
     });
 
     await test.step('2. Popup varsa kapat', async () => {
