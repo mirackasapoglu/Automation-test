@@ -15,6 +15,7 @@
     "test:6ayda1": "playwright test tests/15-6-ayda-1-birikim.spec.ts --project=chromium --headed",
     "test:gumus": "playwright test tests/16-silver-ingot-journey.spec.ts --project=chromium --headed",
     "test:gumusKredi": "playwright test tests/17-silver-creditcard.spec.ts --project=chromium --headed",
+    "test:altınHavale": "playwright test tests/18-gold-transfer-to-account-journey.spec.ts --project=chromium --headed",
     "report": "playwright show-report"
   },
   "devDependencies": {
